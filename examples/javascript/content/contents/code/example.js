@@ -371,7 +371,10 @@ var ExampleResolver = Tomahawk.extend(Tomahawk.Resolver, {
      *        { url: "exampleresolver://752078502200" }    //URL-String that identifies the track
      *
      *
-     * @returns String which contains the translated and playable URL.
+     * @returns Map containing the translated and playable URL.
+     *
+     *        Example:
+     *        { url: "http://x.y/wewillrockyou.mp3" }
      *
      */
     getStreamUrl: function (params) {
@@ -387,6 +390,49 @@ var ExampleResolver = Tomahawk.extend(Tomahawk.Resolver, {
             Tomahawk.log("getStreamUrl - returned \"http://x.y/wewillrockyou.mp3\"");
             return {
                 url: "http://x.y/wewillrockyou.mp3"       //URL from which we can stream the track
+            };
+        });
+    },
+
+    /**
+     * Translate the given URL-string into a downloadable URL-String.
+     * Some services (especially those that require a subscription) don't directly provide a link to
+     * let's say an mp3-file. Instead they'll give out some sort of id that identifies a particular
+     * track on their service. If we now want to download this track, we have to ask the service to
+     * hand out some sort of link that we can download from. That's what this function does.
+     *
+     *
+     * @param params Map containing the URL-String that identifies the track we want to play back
+     *               as well as the format extension (mp3, ...) and mimetype (audio/mpeg, ...)
+     *
+     *        Example:
+     *        {
+     *          url: "exampleresolver://752078502200",      //URL-String that identifies the track
+     *          extension: "mp3",
+     *          mimetype: "audio/mpeg"
+     *        }
+     *
+     *
+     * @returns Map containing the translated and downloadable URL.
+     *
+     *        Example:
+     *        { url: "http://x.y/wewillrockyou.mp3" }
+     */
+    getDownloadUrl: function (params) {
+        Tomahawk.log("getDownloadUrl called - params: " + JSON.stringify(params));
+        var url = params.url;
+        var extension = params.extension;
+        var mimetype = params.mimetype;
+
+        var data = {
+            data: {
+                q: encodeURIComponent(url)
+            }
+        };
+        return Tomahawk.get("http://www.google.de", data).then(function (result) {
+            Tomahawk.log("getDownloadUrl - returned \"http://x.y/wewillrockyou.mp3\"");
+            return {
+                url: "http://x.y/wewillrockyou.mp3"       //URL from which we can download the track
             };
         });
     },
